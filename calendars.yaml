@@ -1,0 +1,134 @@
+# ====================================================================
+# Configuration de l'agrégateur de calendriers ICS
+# --------------------------------------------------------------------
+# - "name"     : nom du calendrier combiné (visible dans Outlook)
+# - "timezone" : fuseau horaire par défaut
+# - "calendars": liste des sources. Pour chacune :
+#     * name   : identifiant unique (libre, mais doit être stable)
+#     * prefix : (optionnel) préfixe ajouté au titre des événements,
+#                ex. "[ENG] Réunion équipe" — pratique pour identifier
+#                la source dans la vue calendrier
+#     * url    : URL du flux ICS (https:// ou webcal://) OU chemin
+#                local (ex. "docs/maison-de-la-danse.ics") généré par
+#                un scraper situé dans scrapers/
+# ====================================================================
+
+name: "Lyon Culture - Calendrier combiné"
+timezone: "Europe/Paris"
+
+calendars:
+  # ---- Flux ICS publics découverts ----
+  - name: "office-tourisme-lyon"
+    # Office de Tourisme — agenda patrimoine/jardins (271 événements)
+    url: "https://openagenda.com/agendas/2248799/events.v2.ics?relative%5B0%5D=current&relative%5B1%5D=upcoming"
+
+  - name: "opera-lyon"
+    prefix: "OPÉRA"
+    url: "webcal://calendbar.com/feeds/77?categories=c4"
+
+  - name: "musee-confluences"
+    prefix: "CONFLUENCES"
+    url: "webcal://calendbar.com/feeds/83?categories=c10"
+
+  - name: "villeurbanne-tnp"
+    # Agenda Villeurbanne (couvre TNP avec ~10 événements)
+    url: "https://openagenda.com/agendas/1168665/events.v2.ics?relative%5B0%5D=current&relative%5B1%5D=upcoming"
+
+  # ---- Sources scrapées par scrapers/ ----
+  # Chaque scraper produit un .ics dans docs/ que l'aggregator inclut
+  - name: "maison-de-la-danse"
+    url: "docs/maison-de-la-danse.ics"
+
+  - name: "le-sucre"
+    prefix: "SUCRE"
+    url: "docs/le-sucre.ics"
+
+  - name: "transbordeur"
+    prefix: "TRANSBO"
+    url: "docs/transbordeur.ics"
+
+  - name: "halle-tony-garnier"
+    prefix: "HTG"
+    url: "docs/halle-tony-garnier.ics"
+
+  - name: "auditorium-onl"
+    prefix: "ONL"
+    url: "docs/auditorium-onl.ics"
+
+  - name: "croix-rousse"
+    prefix: "CROIX-ROUSSE"
+    url: "docs/croix-rousse.ics"
+
+  - name: "celestins"
+    prefix: "CÉLESTINS"
+    url: "docs/celestins.ics"
+
+  - name: "tnp"
+    prefix: "TNP"
+    url: "docs/tnp.ics"
+
+  - name: "tng"
+    prefix: "TNG"
+    url: "docs/tng.ics"
+
+  - name: "comoedia"
+    prefix: "COMOEDIA"
+    url: "docs/comoedia.ics"
+
+  # ---- Tier B — Salles permanentes ----
+  - name: "odeon"
+    prefix: "ODÉON"
+    url: "docs/odeon.ics"
+
+  - name: "ninkasi"
+    prefix: "NINKASI"
+    url: "docs/ninkasi.ics"
+
+  - name: "radiant-bellevue"
+    prefix: "RADIANT"
+    url: "docs/radiant-bellevue.ics"
+
+  - name: "institut-lumiere"
+    prefix: "LUMIÈRE"
+    url: "docs/institut-lumiere.ics"
+
+  - name: "point-du-jour"
+    prefix: "PDJ"
+    url: "docs/point-du-jour.ics"
+
+  - name: "ol-vallee"
+    prefix: "OLV"
+    url: "docs/ol-vallee.ics"
+
+  - name: "machinerie"
+    prefix: "MACHINERIE"
+    url: "docs/machinerie.ics"
+
+  - name: "mac-lyon"
+    prefix: "MAC"
+    url: "docs/mac-lyon.ics"
+
+  # ---- Tier C — Salles supplémentaires ----
+  - name: "toboggan"
+    prefix: "TOBOGGAN"
+    url: "docs/toboggan.ics"
+
+  - name: "periscope"
+    prefix: "PÉRISCOPE"
+    url: "docs/periscope.ics"
+
+  - name: "astree"
+    prefix: "ASTRÉE"
+    url: "docs/astree.ics"
+
+  - name: "subs"
+    prefix: "SUBS"
+    url: "docs/subs.ics"
+
+  - name: "hot-club"
+    prefix: "HOT CLUB"
+    url: "docs/hot-club.ics"
+
+  - name: "nid-de-poule"
+    prefix: "NID DE POULE"
+    url: "docs/nid-de-poule.ics"

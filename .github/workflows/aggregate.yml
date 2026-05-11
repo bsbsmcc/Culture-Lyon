@@ -1,0 +1,74 @@
+name: Aggregate ICS calendars
+
+# Quand le job tourne :
+#   - automatiquement toutes les heures (cron)
+#   - manuellement depuis l'onglet Actions de GitHub (workflow_dispatch)
+#   - à chaque modif de la config sur la branche main
+on:
+  schedule:
+    - cron: "0 * * * *"   # toutes les heures, à h:00
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "calendars.yaml"
+      - "aggregate.py"
+      - "scrapers/**"
+      - "requirements.txt"
+      - ".github/workflows/aggregate.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright browsers
+        run: playwright install chromium --with-deps
+
+      - name: Run scrapers
+        # Chaque scraper produit un fichier ICS dans docs/<lieu>.ics
+        # qui sera ensuite consommé par l'aggregator via calendars.yaml
+        run: |
+          for s in scrapers/*.py; do
+            echo "=== Running $s ==="
+            python "$s" || echo "Scraper $s failed but we continue"
+          done
+
+      - name: Run aggregator
+        run: python aggregate.py
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

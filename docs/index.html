@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lyon Culture — Calendrier combiné</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
+    .card {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+    h1 { font-size: 1.5rem; margin-bottom: .4rem; }
+    .subtitle { color: #666; margin-bottom: 2rem; font-size: .95rem; }
+    .url-box {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+      background: #f0f4ff;
+      border: 1px solid #c7d4ff;
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .url-box code {
+      flex: 1;
+      font-size: .85rem;
+      word-break: break-all;
+      color: #1a3a8f;
+    }
+    .btn {
+      white-space: nowrap;
+      padding: .45rem .9rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: .85rem;
+      font-weight: 600;
+      transition: background .15s;
+    }
+    .btn-copy { background: #e8edff; color: #1a3a8f; }
+    .btn-copy:hover { background: #c7d4ff; }
+    .btn-copy.copied { background: #d1fae5; color: #065f46; }
+    .btn-sub { background: #2563eb; color: #fff; }
+    .btn-sub:hover { background: #1d4ed8; }
+    h2 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 .75rem; color: #444; }
+    .steps { list-style: none; counter-reset: steps; }
+    .steps li {
+      counter-increment: steps;
+      display: flex;
+      gap: .75rem;
+      align-items: flex-start;
+      margin-bottom: .6rem;
+      font-size: .9rem;
+      line-height: 1.4;
+    }
+    .steps li::before {
+      content: counter(steps);
+      min-width: 1.5rem;
+      height: 1.5rem;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: .1rem;
+    }
+    .sources { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+    .tag {
+      background: #f3f4f6;
+      border-radius: 4px;
+      padding: .2rem .55rem;
+      font-size: .78rem;
+      color: #555;
+    }
+    .footer { margin-top: 2rem; font-size: .8rem; color: #999; text-align: center; }
+    .updated { font-size: .78rem; color: #aaa; margin-top: .25rem; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>&#127917; Lyon Culture</h1>
+  <p class="subtitle">Calendrier combiné — toutes les salles en un seul abonnement</p>
+  <div class="url-box">
+    <code id="ics-url"></code>
+    <button class="btn btn-copy" onclick="copyUrl()">Copier</button>
+    <a id="webcal-link" href="#" class="btn btn-sub">S'abonner</a>
+  </div>
+  <h2>Comment s'abonner dans Outlook</h2>
+  <ol class="steps">
+    <li>Ouvrez Outlook sur le web ou dans l'application</li>
+    <li>Calendrier &#8594; <strong>Ajouter un calendrier</strong> &#8594; <strong>S'abonner à partir du web</strong></li>
+    <li>Collez l'URL ci-dessus et donnez un nom au calendrier</li>
+    <li>Cliquez sur <strong>Importer</strong></li>
+  </ol>
+  <p style="font-size:.82rem;color:#888;margin-top:.6rem;">
+    Outlook rafraîchit les abonnements ICS toutes les ~3 heures automatiquement.
+  </p>
+  <h2>Sources incluses (28 salles)</h2>
+  <div class="sources">
+    <span class="tag">Office Tourisme Lyon</span>
+    <span class="tag">Opéra de Lyon</span>
+    <span class="tag">Musée des Confluences</span>
+    <span class="tag">TNP (Villeurbanne)</span>
+    <span class="tag">Maison de la Danse</span>
+    <span class="tag">Le Sucre</span>
+    <span class="tag">Le Transbordeur</span>
+    <span class="tag">Halle Tony Garnier</span>
+    <span class="tag">Auditorium ONL</span>
+    <span class="tag">Théâtre de la Croix-Rousse</span>
+    <span class="tag">Les Célestins</span>
+    <span class="tag">TNP</span>
+    <span class="tag">TNG</span>
+    <span class="tag">Comoedia</span>
+    <span class="tag">L'Odéon</span>
+    <span class="tag">Ninkasi</span>
+    <span class="tag">Radiant-Bellevue</span>
+    <span class="tag">Institut Lumière</span>
+    <span class="tag">Point du Jour</span>
+    <span class="tag">OL Vallée</span>
+    <span class="tag">La Machinerie</span>
+    <span class="tag">MAC Lyon</span>
+    <span class="tag">Le Toboggan</span>
+    <span class="tag">Le Périscope</span>
+    <span class="tag">Théâtre Astrée</span>
+    <span class="tag">Les SUBS</span>
+    <span class="tag">Hot Club Jazz Lyon</span>
+    <span class="tag">Le Nid de Poule</span>
+  </div>
+  <p class="updated" id="updated-line"></p>
+</div>
+<p class="footer">Mis à jour automatiquement toutes les heures via GitHub Actions</p>
+<script>
+  const base = window.location.href.replace(/\/?( index\.html)?$/, '');
+  const icsUrl = base + '/combined.ics';
+  const webcalUrl = icsUrl.replace(/^https?:/, 'webcal:');
+  document.getElementById('ics-url').textContent = icsUrl;
+  document.getElementById('webcal-link').href = webcalUrl;
+  function copyUrl() {
+    navigator.clipboard.writeText(icsUrl).then(() => {
+      const btn = document.querySelector('.btn-copy');
+      btn.textContent = '\u2713 Copié';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+  const d = new Date();
+  document.getElementById('updated-line').textContent =
+    'Page chargée le ' + d.toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+</script>
+</body>
+</html>

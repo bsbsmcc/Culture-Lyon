@@ -13,7 +13,7 @@
 #                un scraper situé dans scrapers/
 # ====================================================================
 
-name: "Lyon Culture - Calendrier combiné"
+name: "Culture Lyon"
 timezone: "Europe/Paris"
 
 calendars:

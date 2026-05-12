@@ -56,17 +56,14 @@ def normalize_allday(component) -> None:
         return
     start = dtstart_prop.dt
     end   = dtend_prop.dt
-    # Already a DATE-only event
     if isinstance(start, date) and not isinstance(start, datetime):
         return
-    # Only convert if duration > 20 hours
     try:
         duration = end - start
     except TypeError:
         return
     if duration.total_seconds() <= 20 * 3600:
         return
-    # Convert to VALUE=DATE
     start_d = start.date() if isinstance(start, datetime) else start
     end_d   = end.date()   if isinstance(end,   datetime) else end
     if end_d <= start_d:
@@ -86,19 +83,12 @@ def merge_calendar(combined: Calendar, source_name: str, prefix: str | None,
     for component in source_cal.walk():
         if component.name != "VEVENT":
             continue
-
-        # Convert full-day DATETIME blocks to proper all-day DATE events
         normalize_allday(component)
-
-        # Optional: prefix the event title to identify the source
         if prefix:
             original_summary = component.get("SUMMARY", "")
             component["SUMMARY"] = f"[{prefix}] {original_summary}"
-
-        # Make UIDs globally unique by namespacing them with the source name
         original_uid = str(component.get("UID", f"event-{count}"))
         component["UID"] = f"{source_name}-{original_uid}"
-
         combined.add_component(component)
         count += 1
     return count
@@ -108,15 +98,12 @@ def main() -> int:
     if not CONFIG_PATH.exists():
         print(f"ERROR: config file not found at {CONFIG_PATH}", file=sys.stderr)
         return 1
-
     with CONFIG_PATH.open("r", encoding="utf-8") as f:
         config = yaml.safe_load(f) or {}
-
     sources = config.get("calendars", [])
     if not sources:
         print("ERROR: no calendars defined in calendars.yaml", file=sys.stderr)
         return 1
-
     combined = Calendar()
     combined.add("prodid", "-//ICS Aggregator//combined calendar//EN")
     combined.add("version", "2.0")
@@ -124,20 +111,16 @@ def main() -> int:
     combined.add("method", "PUBLISH")
     combined.add("x-wr-calname", config.get("name", "Combined Calendar"))
     combined.add("x-wr-timezone", config.get("timezone", "Europe/Paris"))
-
     total_events = 0
     errors: list[str] = []
-
     for source in sources:
         name   = source.get("name", "Unknown")
         url    = source.get("url")
         prefix = source.get("prefix")
-
         if not url:
             errors.append(f"{name}: missing 'url'")
             print(f"  SKIP {name}: missing 'url'", file=sys.stderr)
             continue
-
         print(f"Fetching: {name}", file=sys.stderr)
         try:
             raw   = fetch_ics(url)
@@ -152,21 +135,13 @@ def main() -> int:
             err = f"{name}: {type(e).__name__}: {e}"
             print(f"  FAIL {err}", file=sys.stderr)
             errors.append(err)
-
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_bytes(combined.to_ical())
-
-    print(
-        f"\nWrote {total_events} events from {len(sources) - len(errors)}/"
-        f"{len(sources)} sources to {OUTPUT_PATH}",
-        file=sys.stderr,
-    )
-
+    print(f"\nWrote {total_events} events from {len(sources)-len(errors)}/{len(sources)} sources to {OUTPUT_PATH}", file=sys.stderr)
     if errors:
         print(f"\n{len(errors)} source(s) failed:", file=sys.stderr)
         for err in errors:
             print(f"  - {err}", file=sys.stderr)
-
     return 0
 
 

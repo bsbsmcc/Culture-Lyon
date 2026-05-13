@@ -47,23 +47,37 @@ def fetch_ics(url_or_path: str) -> bytes:
 
 
 def normalize_allday(component) -> None:
-    """Convert full-day DATETIME events (duration > 20h) to VALUE=DATE
-    all-day events so they appear as banners in Outlook instead of huge
-    blocks in the time grid."""
+    """Convert long daytime DATETIME events to VALUE=DATE all-day events.
+
+    Heuristic: duration > 4h AND starts before noon.
+    Catches museum exhibitions (10h-18h = 8h) without touching
+    evening concerts (19h-22h = 3h) or late-night shows.
+    """
     dtstart_prop = component.get("DTSTART")
     dtend_prop   = component.get("DTEND")
     if not dtstart_prop or not dtend_prop:
         return
+
     start = dtstart_prop.dt
     end   = dtend_prop.dt
+
+    # Already a DATE-only event -- nothing to do
     if isinstance(start, date) and not isinstance(start, datetime):
         return
+
     try:
         duration = end - start
     except TypeError:
         return
-    if duration.total_seconds() <= 20 * 3600:
+
+    # Must be > 4h AND start before noon to avoid converting evening shows
+    if duration.total_seconds() <= 4 * 3600:
         return
+    start_hour = start.hour if isinstance(start, datetime) else 0
+    if start_hour >= 12:
+        return
+
+    # Convert to VALUE=DATE
     start_d = start.date() if isinstance(start, datetime) else start
     end_d   = end.date()   if isinstance(end,   datetime) else end
     if end_d <= start_d:
